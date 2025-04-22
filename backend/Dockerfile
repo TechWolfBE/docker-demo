@@ -2,6 +2,7 @@
 ###### Base image ######
 ########################
 
+# Use python:3.11-slim as base image
 FROM python:3.11-slim AS app
 
 # Set the working directory for the application
@@ -14,6 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
+# Set the default command to run the application
+# This will be executed when running the container using `docker run`, docker-compose, etc. 
 CMD ["fastapi", "run", "--host", "0.0.0.0", "--port", "5000"]
 
 
@@ -21,6 +24,7 @@ CMD ["fastapi", "run", "--host", "0.0.0.0", "--port", "5000"]
 ###### Dev image ######
 #######################
 
+# Use the app image as base image
 FROM app AS dev
 
 # Install development dependencies

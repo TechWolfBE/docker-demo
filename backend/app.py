@@ -1,8 +1,9 @@
-from fastapi import FastAPI
-from typing import List
+from fastapi import FastAPI, Body
+from typing import List, Annotated
 import psycopg2
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -34,3 +35,18 @@ def get_data() -> List[tuple]:
     cur.close()
     conn.close()
     return rows
+
+
+class Message(BaseModel):
+    message: str
+
+
+@app.post("/api/data")
+def post_message(message: Message):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("INSERT INTO messages (message) VALUES (%s);", (message.message,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"message": "Data inserted successfully"}

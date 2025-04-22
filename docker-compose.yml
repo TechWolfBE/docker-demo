@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - appnet
+
+  backend-prod:
+    profiles:
+      - prod
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      target: app
+    environment:
+      DB_PASSWORD: password
+    ports:
+      - "5678:5000"
+    depends_on:
+      - db
+    networks:
+      appnet:
+        aliases:
+          - backend
+
+  backend-dev:
+    profiles:
+      - dev
+    build:
+      context: backend
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./backend:/app
+    environment:
+      DB_PASSWORD: password
+    ports:
+      - "5678:5000"
+    depends_on:
+      - db
+    networks:
+      appnet:
+        aliases:
+          - backend
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - db
+    ports:
+      - "3456:3000"
+    networks:
+      - appnet
+
+volumes:
+  db_data:
+
+networks:
+  appnet:

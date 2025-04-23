@@ -19,6 +19,12 @@ COPY . .
 # Build the application
 RUN npm run build
 
+
+FROM node:22-slim AS app
+
+WORKDIR /app
+
+COPY --from=build /app/build ./build/
 # Use serve for static file hosting
 RUN npm install -g serve
 

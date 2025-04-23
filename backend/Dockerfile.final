@@ -8,11 +8,12 @@ FROM python:3.13-slim AS app
 # Set the working directory for the application
 WORKDIR /app
 
+# Install requirements, copy the requirements file first to leverage Docker cache
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Copy the application code
 COPY . .
-
-# Install the requirements
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the default command to run the application
 # This will be executed when running the container using `docker run`, docker-compose, etc. 
